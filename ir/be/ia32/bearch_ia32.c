@@ -338,6 +338,12 @@ static int ia32_get_op_estimated_cost(const ir_node *irn)
 /** Get the mode that should be used for spilling value @p node */
 static ir_mode *get_spill_mode(const ir_node *node)
 {
+	if (is_Proj(node)) {
+		ir_node *pred = get_Proj_pred(node);
+		if (is_ia32_fld(pred) || is_ia32_xLoad(pred) || is_ia32_xxLoad(pred)) {
+			return get_ia32_ls_mode(pred);
+		}
+	}
 	ir_mode *mode = get_irn_mode(node);
 	if (mode_is_float(mode))
 		return precise_x87_spills ? ia32_mode_E : mode_D;
