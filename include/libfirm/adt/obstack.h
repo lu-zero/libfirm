@@ -154,6 +154,8 @@ Summary:
 #include <string.h>
 #include <stdarg.h>
 
+#include "macros.h"
+
 struct _obstack_chunk		/* Lives at front of each chunk. */
 {
   char  *limit;			/* 1 past end of this chunk */
@@ -207,7 +209,7 @@ FIRM_API void obstack_free (struct obstack *obstack, void *block);
    more memory.  This can be set to a user defined function which
    should either abort gracefully or use longjump - but shouldn't
    return.  The default action is to print a message and abort.  */
-FIRM_API void (*obstack_alloc_failed_handler) (void);
+FIRM_API NORETURN (*obstack_alloc_failed_handler) (void);
 
 /* Exit value used when `print_and_abort' is used.  */
 FIRM_API int obstack_exit_failure;

@@ -66,8 +66,8 @@ enum
    abort gracefully or use longjump - but shouldn't return.  This
    variable by default points to the internal function
    `print_and_abort'.  */
-static void print_and_abort (void);
-void (*obstack_alloc_failed_handler) (void) = print_and_abort;
+static NORETURN print_and_abort (void);
+NORETURN (*obstack_alloc_failed_handler) (void) = print_and_abort;
 
 /* Exit value used when `print_and_abort' is used.  */
 # include <stdlib.h>
