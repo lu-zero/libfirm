@@ -13,6 +13,9 @@
 #   define NORETURN void __attribute__ ((noreturn))
 #  endif /* __GNUC__ >= 3 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 70) */
 # endif /* defined(__GNUC__) */
+# if __STDC__ && (__STDC_VERSION__ == 201112L)
+#  define NORETURN _Noreturn void
+# endif /* __STDC__ && (__STDC_VERSION__ == 201112L)  */
 
 # if defined(_MSC_VER)
 #  define NORETURN void __declspec(noreturn)
