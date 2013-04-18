@@ -365,15 +365,14 @@ static void copy_parameter_entities(ir_node *call, ir_graph *called_graph)
  * Internal version to inline a function.
  * Returns whether the inlining actually occured.
  */
-static int inline_method_(ir_node *const call, ir_graph *called_graph, pqueue_t *todo)
+static void inline_method_(ir_node *const call, ir_graph *called_graph, pqueue_t *todo)
 {
 	assert (can_inline(call, called_graph));
 
 	/* We cannot inline a recursive call. The graph must be copied before
 	 * the call the inline_method() using create_irg_copy(). */
 	ir_graph *irg = get_irn_irg(call);
-	if (called_graph == irg)
-		return 0;
+	assert (called_graph != irg);
 
 	ir_entity *ent      = get_irg_entity(called_graph);
 	ir_type   *mtp      = get_entity_type(ent);
@@ -677,7 +676,10 @@ int inline_method(ir_node *const call, ir_graph *called_graph)
 {
 	if (! can_inline(call, called_graph))
 		return 0;
-	return inline_method_(call, called_graph, NULL);
+	if (get_irn_irg(call) == called_graph)
+		return 0;
+	inline_method_(call, called_graph, NULL);
+	return 1;
 }
 
 static struct obstack  temp_obst;
@@ -1095,10 +1097,9 @@ static void maybe_inline(ir_node *call, unsigned maxsize, int threshold, pqueue_
 	ir_reserve_resources(irg, IR_RESOURCE_IRN_LINK|IR_RESOURCE_PHI_LIST);
 	collect_phiprojs(irg);
 
-	int did_inline = inline_method_(call, callee_irg, todo);
+	inline_method_(call, callee_irg, todo);
 
 	ir_free_resources(irg, IR_RESOURCE_IRN_LINK|IR_RESOURCE_PHI_LIST);
-	if (!did_inline) return;
 
 	/* update caller info */
 	DB((dbg, LEVEL_2, "%+F: now %d + %d nodes\n",
